@@ -1,7 +1,9 @@
 package es.um.redes.nanoFiles.udp.message;
 
+import java.net.InetSocketAddress;
+import java.util.List;
 
-
+import es.um.redes.nanoFiles.util.FileInfo;
 
 /**
  * Clase que modela los mensajes del protocolo de comunicación entre pares para
@@ -27,6 +29,12 @@ public class DirMessage {
 	 * todos los campos que pueden aparecer en los mensajes de este protocolo
 	 * (formato campo:valor)
 	 */
+	private static final String FIELDNAME_PROTOCOL = "protocol";
+	
+	private static final String FIELDNAME_FILESIZE = "filesize";
+	private static final String FIELDNAME_FILENAME = "filename";
+	private static final String FIELDNAME_FILEHASH = "filehash";
+	private static final String FIELDNAME_SERVERADDRESS = "serveraddress";
 
 
 
@@ -43,19 +51,25 @@ public class DirMessage {
 	 * los campos de los diferentes mensajes de este protocolo.
 	 */
 
-
-
+	private String fileName;
+	private int fileSize;
+	private String fileHash;
+	private InetSocketAddress serverAddress;
+	
 
 	public DirMessage(String op) {
 		operation = op;
 	}
+	
+
+
 
 	/*
 	 * TODO: (Boletín MensajesASCII) Crear diferentes constructores adecuados para
 	 * construir mensajes de diferentes tipos con sus correspondientes argumentos
 	 * (campos del mensaje)
 	 */
-
+	
 
 
 
@@ -69,6 +83,7 @@ public class DirMessage {
 	 * compruebe que no se modifica/obtiene el valor de un campo (atributo) que no
 	 * esté definido para el tipo de mensaje dado por "operation".
 	 */
+	
 	public void setProtocolID(String protocolIdent) {
 		if (!operation.equals(DirMessageOps.OPERATION_PING)) {
 			throw new RuntimeException(
@@ -77,10 +92,8 @@ public class DirMessage {
 		protocolId = protocolIdent;
 	}
 
+	
 	public String getProtocolId() {
-
-
-
 		return protocolId;
 	}
 
@@ -122,9 +135,10 @@ public class DirMessage {
 				m = new DirMessage(value);
 				break;
 			}
-
-
-
+			case FIELDNAME_PROTOCOL:
+				if(m!=null && (m.operation.equals(DirMessageOps.OPERATION_PING)))
+					m.setProtocolID(value);
+				break;
 
 			default:
 				System.err.println("PANIC: DirMessage.fromString - message with unknown field name " + fieldName);
@@ -155,8 +169,16 @@ public class DirMessage {
 		 * una cadena la operación y concatenar el resto de campos necesarios usando los
 		 * valores de los atributos del objeto.
 		 */
-
-
+		switch(operation) {
+		case(DirMessageOps.OPERATION_PING):{
+			sb.append(FIELDNAME_PROTOCOL+ DELIMITER + protocolId + END_LINE);
+		}
+		case(DirMessageOps.OPERATION_PING_OK):
+			break;
+		case(DirMessageOps.OPERATION_PING_FAILED):
+			break;
+		}
+		
 
 		sb.append(END_LINE); // Marcamos el final del mensaje
 		return sb.toString();

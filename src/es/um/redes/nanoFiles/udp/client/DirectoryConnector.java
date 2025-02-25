@@ -241,13 +241,39 @@ public class DirectoryConnector {
 		 * TODO: (Boletín MensajesASCII) Hacer ping al directorio 1.Crear el mensaje a
 		 * enviar (objeto DirMessage) con atributos adecuados (operation, etc.) NOTA:
 		 * Usar como operaciones las constantes definidas en la clase DirMessageOps :
-		 * 2.Convertir el objeto DirMessage a enviar a un string (método toString)
-		 * 3.Crear un datagrama con los bytes en que se codifica la cadena : 4.Enviar
-		 * datagrama y recibir una respuesta (sendAndReceiveDatagrams). : 5.Convertir
-		 * respuesta recibida en un objeto DirMessage (método DirMessage.fromString)
-		 * 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
+		 */
+		
+		DirMessage mensajeEnviar= new DirMessage(DirMessageOps.OPERATION_PING);
+		mensajeEnviar.setProtocolID(NanoFiles.PROTOCOL_ID);
+		
+		/* 2.Convertir el objeto DirMessage a enviar a un string (método toString)*/
+		String mensajeString = mensajeEnviar.toString();
+		
+		
+		/* 3.Crear un datagrama con los bytes en que se codifica la cadena : */
+		
+		byte[] bytesDatagrama = mensajeString.getBytes();
+		
+		/*4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams). :*/
+		
+		byte[] dataFromServer=sendAndReceiveDatagrams(bytesDatagrama);
+		
+		if (dataFromServer == null || dataFromServer.length == 0) {
+	        System.err.println("Error: No se recibió respuesta del servidor.");
+	        return false;
+	    }
+		
+		/* 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)*/
+		String messageFromServer = new String(dataFromServer, 0, dataFromServer.length);
+		DirMessage respuesta = DirMessage.fromString(messageFromServer);
+		
+		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
 		 * de la operación
 		 */
+		
+		if (respuesta != null && DirMessageOps.OPERATION_PING_OK.equals(respuesta.getOperation())) {
+	        success = true;
+	    }
 
 
 
