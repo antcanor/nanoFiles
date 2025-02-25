@@ -2,6 +2,7 @@ package es.um.redes.nanoFiles.udp.message;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import es.um.redes.nanoFiles.util.FileInfo;
@@ -36,7 +37,7 @@ public class DirMessage {
 	private static final String FIELDNAME_FILESIZE = "filesize";
 	private static final String FIELDNAME_FILENAME = "filename";
 	private static final String FIELDNAME_FILEHASH = "filehash";
-	private static final String FIELDNAME_SERVERADDRESS = "serveraddress";
+	private static final String FIELDNAME_SERVERPORT = "serverport";
 
 
 
@@ -53,7 +54,7 @@ public class DirMessage {
 	 * los campos de los diferentes mensajes de este protocolo.
 	 */
 
-	private InetSocketAddress serverAddress;
+	private InetSocketAddress serverPort;
 	private List<FileInfo> fileList;
 	
 
@@ -103,13 +104,20 @@ public class DirMessage {
         return fileList;
     }
 	
-	 public void setFileList(List<FileInfo> fileList) {
+	 public void setFileList(FileInfo[] files) {
 	        if (!operation.equals(DirMessageOps.OPERATION_GET_FILELIST)) {
 	            throw new RuntimeException(
 	                    "DirMessage: setFileList called for message of unexpected type (" + operation + ")");
 	        }
-	        this.fileList = fileList;
-	    }
+	        this.fileList = Arrays.asList(files);
+	 }
+	 
+	 public void setServerPort(int puerto) {
+		 this.serverPort=new InetSocketAddress(puerto);
+	 }
+	 public int getServerPort() {
+		 return this.serverPort.getPort();
+	 }
 
 	/**
 	 * Método que convierte un mensaje codificado como una cadena de caracteres, a
@@ -210,6 +218,13 @@ public class DirMessage {
 					sb.append(FIELDNAME_FILEINFO+DELIMITER+fi.fileName+","+fi.fileSize+","+fi.fileHash+END_LINE);
 				}
 			}
+			break;
+		}
+		case(DirMessageOps.OPERATION_REGISTER_FILESERVER):{
+			break;
+		}
+		case(DirMessageOps.OPERATION_REGISTER_FILESERVER_OK):{
+			
 			break;
 		}
 		}
