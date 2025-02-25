@@ -50,6 +50,9 @@ public class NFDirectoryServer {
 		 * UDP ligado al puerto especificado por el argumento directoryPort en la
 		 * máquina local,
 		 */
+		this.socket=new DatagramSocket(DIRECTORY_PORT);
+		
+		
 		/*
 		 * TODO: (Boletín SocketsUDP) Inicializar atributos que mantienen el estado del
 		 * servidor de directorio: ficheros, etc.)
@@ -74,10 +77,15 @@ public class NFDirectoryServer {
 			 * TODO: (Boletín SocketsUDP) Crear un búfer para recibir datagramas y un
 			 * datagrama asociado al búfer (datagramReceivedFromClient)
 			 */
+			
+			byte[] recvBuf = new byte[DirMessage.PACKET_MAX_SIZE];
+			datagramReceivedFromClient=new DatagramPacket(recvBuf, recvBuf.length);
+			
 			/*
 			 * TODO: (Boletín SocketsUDP) Recibimos a través del socket un datagrama
 			 */
-
+			socket.receive(datagramReceivedFromClient);
+			
 
 
 			if (datagramReceivedFromClient == null) {
@@ -122,6 +130,9 @@ public class NFDirectoryServer {
 		 * en el datagrama pkt. A continuación, imprimir por pantalla dicha cadena a
 		 * modo de depuración.
 		 */
+		
+		String datosRecibidos = new String(pkt.getData(),0,pkt.getLength());
+		System.out.println("datos recibidos: "+datosRecibidos);
 
 		/*
 		 * TODO: (Boletín SocketsUDP) Después, usar la cadena para comprobar que su
@@ -129,6 +140,14 @@ public class NFDirectoryServer {
 		 * cadena "pingok". Si el mensaje recibido no es "ping", se informa del error y
 		 * se envía "invalid" como respuesta.
 		 */
+		if("ping".equals(datosRecibidos)) {
+			String datosEnviar = "pingok";
+			byte[] pktEnvio = datosEnviar.getBytes();
+			DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
+			socket.send(datagramaEnviar);
+		}else {
+			System.err.println("No se ha recibido el mensaje esperado");
+		}
 
 		/*
 		 * TODO: (Boletín Estructura-NanoFiles) Ampliar el código para que, en el caso

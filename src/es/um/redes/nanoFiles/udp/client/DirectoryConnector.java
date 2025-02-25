@@ -108,6 +108,8 @@ public class DirectoryConnector {
 		while(intentos<MAX_NUMBER_OF_ATTEMPTS && !hayRespuesta) {
 			try {
 				socket.send(packetToServer);
+				
+				socket.setSoTimeout(2000);
 				socket.receive(paquetesDelServidor);	
 				hayRespuesta=true;
 			}catch (SocketTimeoutException e) {
