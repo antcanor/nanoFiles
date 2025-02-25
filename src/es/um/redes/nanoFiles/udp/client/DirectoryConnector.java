@@ -141,7 +141,9 @@ public class DirectoryConnector {
 		if(!hayRespuesta) {
 			System.err.println("No ha habido respuesta tras "+MAX_NUMBER_OF_ATTEMPTS+" intentos.");
 		}else {
-			response="pingok".getBytes();
+			int longitudRespuesta=paquetesDelServidor.getLength();
+			response=new byte[longitudRespuesta];
+			System.arraycopy(responseData, 0, response, 0, longitudRespuesta);
 		}
 		
 
@@ -200,15 +202,30 @@ public class DirectoryConnector {
 		 * PROTOCOL_ID (ver clase NanoFiles). Se deben usar mensajes "en crudo" (sin un
 		 * formato bien definido) para la comunicación.
 		 * 
-		 * PASOS: 1.Crear el mensaje a enviar (String "ping&protocolId"). 2.Crear un
-		 * datagrama con los bytes en que se codifica la cadena : 4.Enviar datagrama y
-		 * recibir una respuesta (sendAndReceiveDatagrams). : 5. Comprobar si la cadena
-		 * recibida en el datagrama de respuesta es "welcome", imprimir si éxito o
-		 * fracaso. 6.Devolver éxito/fracaso de la operación.
+		 * PASOS: 1.Crear el mensaje a enviar (String "ping&protocolId"). 
 		 */
-
-
-
+		String mensaje="ping&"+NanoFiles.PROTOCOL_ID;
+		 /* 2.Crear un datagrama con los bytes en que se codifica la cadena : */
+		
+		byte[] bytesDatagrama = mensaje.getBytes();
+		
+		  /*4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams). : */
+		byte[] dataFromServer=null;
+		dataFromServer = sendAndReceiveDatagrams(bytesDatagrama);
+		
+		/*5. Comprobar si la cadena recibida en el datagrama de respuesta es "welcome", imprimir si éxito o
+		 * fracaso.  */
+		if(dataFromServer!=null) {
+			String datagramaRespuesta = new String(dataFromServer,0,dataFromServer.length);
+			if(datagramaRespuesta.equals("welcome")) {
+				success=true;
+				System.out.println("**EXITO**");
+			}else {
+				System.err.println("**FRACASO**");
+			}
+		}
+		//6.Devolver éxito/fracaso de la operación	
+			
 		return success;
 	}
 

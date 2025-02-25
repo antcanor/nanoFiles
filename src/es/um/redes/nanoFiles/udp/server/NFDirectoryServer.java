@@ -145,8 +145,23 @@ public class NFDirectoryServer {
 			byte[] pktEnvio = datosEnviar.getBytes();
 			DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
 			socket.send(datagramaEnviar);
+		}else if(datosRecibidos.startsWith("ping&")){
+			if(datosRecibidos.equals("ping&"+NanoFiles.PROTOCOL_ID)) {
+				String datosEnviar = "welcome";
+				byte[] pktEnvio = datosEnviar.getBytes();
+				DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
+				socket.send(datagramaEnviar);
+			}else {
+				String datosEnviar = "denied";
+				byte[] pktEnvio = datosEnviar.getBytes();
+				DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
+				socket.send(datagramaEnviar);
+			}
 		}else {
-			System.err.println("No se ha recibido el mensaje esperado");
+			String datosEnviar = "invalid";
+			byte[] pktEnvio = datosEnviar.getBytes();
+			DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
+			socket.send(datagramaEnviar);
 		}
 
 		/*
