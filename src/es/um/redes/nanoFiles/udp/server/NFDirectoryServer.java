@@ -253,6 +253,10 @@ public class NFDirectoryServer {
 			System.out.println(mensajeRespuesta.toString());
 			break;
 		}
+		case DirMessageOps.OPERATION_GET_FILELIST:{
+			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST_OK);
+			break;
+		}
 
 
 

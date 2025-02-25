@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.udp.message.DirMessage;
@@ -309,9 +310,40 @@ public class DirectoryConnector {
 	 *         pudo satisfacer nuestra solicitud
 	 */
 	public FileInfo[] getFileList() {
-		FileInfo[] filelist = new FileInfo[0];
+		FileInfo[] filelist = null;
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
-
+		/*
+		 * TODO: (Boletín MensajesASCII) Hacer ping al directorio 1.Crear el mensaje a
+		 * enviar (objeto DirMessage) con atributos adecuados (operation, etc.) NOTA:
+		 * Usar como operaciones las constantes definidas en la clase DirMessageOps :
+		 */
+		
+		DirMessage mensajeEnviar= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST);		
+		/* 2.Convertir el objeto DirMessage a enviar a un string (método toString)*/
+		String mensajeString = mensajeEnviar.toString();
+		/* 3.Crear un datagrama con los bytes en que se codifica la cadena : */
+		
+		byte[] bytesDatagrama = mensajeString.getBytes();
+		
+		/*4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams). :*/
+		
+		byte[] dataFromServer=sendAndReceiveDatagrams(bytesDatagrama);
+		
+		
+		/* 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)*/
+		String messageFromServer = new String(dataFromServer, 0, dataFromServer.length);
+		DirMessage respuesta = DirMessage.fromString(messageFromServer);
+		
+		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
+		 * de la operación
+		 */
+		
+		if (respuesta != null && DirMessageOps.OPERATION_GET_FILELIST_OK.equals(respuesta.getOperation())) {
+			List<FileInfo> files = respuesta.getFileList();
+			 if (files != null) {
+                 filelist = files.toArray(new FileInfo[files.size()]);
+             }
+	    }
 
 
 		return filelist;

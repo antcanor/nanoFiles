@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.udp.message;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.um.redes.nanoFiles.util.FileInfo;
@@ -30,7 +31,8 @@ public class DirMessage {
 	 * (formato campo:valor)
 	 */
 	private static final String FIELDNAME_PROTOCOL = "protocol";
-	
+	private static final String FIELDNAME_FILELIST = "filelist";
+	private static final String FIELDNAME_FILEINFO = "file";
 	private static final String FIELDNAME_FILESIZE = "filesize";
 	private static final String FIELDNAME_FILENAME = "filename";
 	private static final String FIELDNAME_FILEHASH = "filehash";
@@ -51,14 +53,13 @@ public class DirMessage {
 	 * los campos de los diferentes mensajes de este protocolo.
 	 */
 
-	private String fileName;
-	private int fileSize;
-	private String fileHash;
 	private InetSocketAddress serverAddress;
+	private List<FileInfo> fileList;
 	
 
 	public DirMessage(String op) {
 		operation = op;
+		this.fileList=new ArrayList<FileInfo>();
 	}
 	
 
@@ -98,7 +99,17 @@ public class DirMessage {
 	}
 
 
-
+	public List<FileInfo> getFileList() {
+        return fileList;
+    }
+	
+	 public void setFileList(List<FileInfo> fileList) {
+	        if (!operation.equals(DirMessageOps.OPERATION_GET_FILELIST)) {
+	            throw new RuntimeException(
+	                    "DirMessage: setFileList called for message of unexpected type (" + operation + ")");
+	        }
+	        this.fileList = fileList;
+	    }
 
 	/**
 	 * Método que convierte un mensaje codificado como una cadena de caracteres, a
@@ -139,6 +150,20 @@ public class DirMessage {
 				if(m!=null && (m.operation.equals(DirMessageOps.OPERATION_PING)))
 					m.setProtocolID(value);
 				break;
+			case FIELDNAME_FILEINFO:
+				if (m != null && m.operation.equals(DirMessageOps.OPERATION_GET_FILELIST_OK)) {
+					if (m.fileList == null) {
+                        m.fileList = new ArrayList<>();
+                    }
+                    String[] fileInfo = value.split(",");
+                    if (fileInfo.length == 3) {
+                        String fileName = fileInfo[0];
+                        long fileSize = Long.parseLong(fileInfo[1]);
+                        String fileHash = fileInfo[2];
+                        m.fileList.add(new FileInfo(fileHash, fileName, fileSize, ""));
+                    }
+                }
+                break;
 
 			default:
 				System.err.println("PANIC: DirMessage.fromString - message with unknown field name " + fieldName);
@@ -177,7 +202,18 @@ public class DirMessage {
 			break;
 		case(DirMessageOps.OPERATION_PING_FAILED):
 			break;
+		case (DirMessageOps.OPERATION_GET_FILELIST): 
+            break;
+		case(DirMessageOps.OPERATION_GET_FILELIST_OK):{
+			if(fileList!=null) {
+				for(FileInfo fi:fileList) {
+					sb.append(FIELDNAME_FILEINFO+DELIMITER+fi.fileName+","+fi.fileSize+","+fi.fileHash+END_LINE);
+				}
+			}
+			break;
 		}
+		}
+		
 		
 
 		sb.append(END_LINE); // Marcamos el final del mensaje
