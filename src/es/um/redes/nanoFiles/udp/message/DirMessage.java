@@ -1,5 +1,6 @@
 package es.um.redes.nanoFiles.udp.message;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,12 +101,19 @@ public class DirMessage {
 	}
 
 
-	public List<FileInfo> getFileList() {
-        return fileList;
+	public FileInfo[] getFileList() {
+		if (!operation.equals(DirMessageOps.OPERATION_REGISTER_FILESERVER) && !operation.equals(DirMessageOps.OPERATION_GET_FILELIST_OK)) {
+			throw new RuntimeException(
+					"DirMessage: getFileList called for message of unexpected type (" + operation + ")");
+		}
+		FileInfo[] files = new FileInfo[fileList.size()];
+		files = fileList.toArray(new FileInfo[0]);
+		return files;
+
     }
 	
 	 public void setFileList(FileInfo[] files) {
-	        if (!operation.equals(DirMessageOps.OPERATION_GET_FILELIST)) {
+	        if (!operation.equals(DirMessageOps.OPERATION_GET_FILELIST_OK) && !operation.equals(DirMessageOps.OPERATION_REGISTER_FILESERVER)) {
 	            throw new RuntimeException(
 	                    "DirMessage: setFileList called for message of unexpected type (" + operation + ")");
 	        }
@@ -221,6 +229,13 @@ public class DirMessage {
 			break;
 		}
 		case(DirMessageOps.OPERATION_REGISTER_FILESERVER):{
+			sb.append(FIELDNAME_SERVERPORT+DELIMITER+getServerPort()+END_LINE);
+			sb.append(FIELDNAME_FILELIST+DELIMITER+END_LINE);
+			if(fileList!=null) {
+				for(FileInfo fi:fileList) {
+					sb.append(FIELDNAME_FILEINFO+DELIMITER+fi.fileName+","+fi.fileSize+","+fi.fileHash+END_LINE);
+				}
+			}
 			break;
 		}
 		case(DirMessageOps.OPERATION_REGISTER_FILESERVER_OK):{

@@ -370,10 +370,8 @@ public class DirectoryConnector {
 		 */
 		
 		if (respuesta != null && DirMessageOps.OPERATION_GET_FILELIST_OK.equals(respuesta.getOperation())) {
-			List<FileInfo> files = respuesta.getFileList();
-			 if (files != null) {
-                 filelist = files.toArray(new FileInfo[files.size()]);
-             }
+			FileInfo[] files = respuesta.getFileList();
+			filelist = files;
 	    }
 
 
