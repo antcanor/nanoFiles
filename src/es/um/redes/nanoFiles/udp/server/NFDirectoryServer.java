@@ -33,9 +33,9 @@ public class NFDirectoryServer {
 	 * registrados, etc.
 	 */
 
-	Map<FileInfo, LinkedList<InetSocketAddress>> files = new HashMap<FileInfo, LinkedList<InetSocketAddress>>(); //Mapa de ficheros y servidores que los tienen
-	Map<InetSocketAddress, LinkedList<FileInfo>> servers = new HashMap<InetSocketAddress, LinkedList<FileInfo>>(); //Mapa de servidores y ficheros que tienen
-	Map<String, LinkedList<FileInfo>> fileInfoMap = new HashMap<String, LinkedList<FileInfo>>(); //Mapa de hash de fichero y fichero
+	private Map<FileInfo, LinkedList<InetSocketAddress>> files; //Mapa de ficheros y servidores que los tienen
+	private Map<InetSocketAddress, LinkedList<FileInfo>> servers; //Mapa de servidores y ficheros que tienen
+	private Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
 
 	/**
 	 * Probabilidad de descartar un mensaje recibido en el directorio (para simular
@@ -62,6 +62,9 @@ public class NFDirectoryServer {
 		 * servidor de directorio: ficheros, etc.)
 		 */
 
+		this.files= new HashMap<FileInfo, LinkedList<InetSocketAddress>>();
+		this.servers = new HashMap<InetSocketAddress, LinkedList<FileInfo>>();
+		this.fileInfoMap = new HashMap<String, LinkedList<FileInfo>>();
 
 
 		if (NanoFiles.testModeUDP) {

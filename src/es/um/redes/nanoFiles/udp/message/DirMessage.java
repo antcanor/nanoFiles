@@ -64,6 +64,9 @@ public class DirMessage {
 	public DirMessage(String op) {
 		operation = op;
 		this.fileList=new ArrayList<FileInfo>();
+		this.serverList=new ArrayList<InetSocketAddress>();
+		this.FileNamesubString=null;
+		this.serverPort=null;
 	}
 	
 
