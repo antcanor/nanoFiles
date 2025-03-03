@@ -5,11 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.udp.message.DirMessage;
@@ -35,8 +35,7 @@ public class NFDirectoryServer {
 
 	Map<FileInfo, LinkedList<InetSocketAddress>> files = new HashMap<FileInfo, LinkedList<InetSocketAddress>>(); //Mapa de ficheros y servidores que los tienen
 	Map<InetSocketAddress, LinkedList<FileInfo>> servers = new HashMap<InetSocketAddress, LinkedList<FileInfo>>(); //Mapa de servidores y ficheros que tienen
-	//Map<String, LinkedList<InetSocketAddress>> clients = new HashMap<String, LinkedList<InetSocketAddress>>(); //Mapa de clientes y ficheros que tienen
-
+	Map<String, LinkedList<FileInfo>> fileInfoMap = new HashMap<String, LinkedList<FileInfo>>(); //Mapa de hash de fichero y fichero
 
 	/**
 	 * Probabilidad de descartar un mensaje recibido en el directorio (para simular
@@ -258,22 +257,22 @@ public class NFDirectoryServer {
 			System.out.println(mensajeRespuesta.toString());
 			break;
 		}
-		case DirMessageOps.OPERATION_GET_FILELIST:{
-			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST_OK);
-			LinkedList<FileInfo> listaFicheros = new LinkedList<FileInfo>();
-			for(FileInfo f:files.keySet()) {
-				listaFicheros.add(f);
-			}
-			FileInfo[] listaFicherosArray = new FileInfo[listaFicheros.size()];
-			listaFicherosArray = listaFicheros.toArray(listaFicherosArray);
-			mensajeRespuesta.setFileList(listaFicherosArray);
-			System.out.println(mensajeRespuesta.toString());
-			break;
-		}
+
 		case DirMessageOps.OPERATION_REGISTER_FILESERVER:{
 			FileInfo[] listaFicheros = mensajeRecibido.getFileList();
-			InetSocketAddress server = (InetSocketAddress) pkt.getSocketAddress();
+			int serverPort = mensajeRecibido.getServerPort();
+			InetSocketAddress server = new InetSocketAddress(serverPort);
 			for(FileInfo f:listaFicheros) {
+				String fileHash = f.fileHash;
+				if (fileInfoMap.containsKey(fileHash)) {
+					fileInfoMap.get(fileHash).add(f);
+					
+				}else {
+					LinkedList<FileInfo> lista = new LinkedList<FileInfo>();
+					lista.add(f);
+					fileInfoMap.put(fileHash, lista);
+				} 
+				
 				if(files.containsKey(f)) {
 					files.get(f).add(server);
 				}else {
@@ -293,6 +292,36 @@ public class NFDirectoryServer {
 			System.out.println(mensajeRespuesta.toString());
 			break;
 		}
+
+		case DirMessageOps.OPERATION_GET_FILELIST:{
+			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST_OK);
+			LinkedList<FileInfo> listaFicheros = new LinkedList<FileInfo>();
+			for(FileInfo f:files.keySet()) {
+				listaFicheros.add(f);
+			}
+			FileInfo[] listaFicherosArray = new FileInfo[listaFicheros.size()];
+			listaFicherosArray = listaFicheros.toArray(listaFicherosArray);
+			mensajeRespuesta.setFileList(listaFicherosArray);
+			System.out.println(mensajeRespuesta.toString());
+			break;
+		}
+
+		case DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE:{
+			String subString = mensajeRecibido.getFileNameSubString();
+			Set<FileInfo> ficheros = files.keySet();
+			LinkedList<InetSocketAddress> servidores = new LinkedList<InetSocketAddress>();
+			for(FileInfo f:ficheros) {
+				if(f.fileName.contains(subString)) {
+					servidores.addAll(files.get(f));
+				}
+			}
+			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK);
+			mensajeRespuesta.setServerList(servidores);
+			System.out.println(mensajeRespuesta.toString());
+			break;
+			
+		}
+		
 
 
 

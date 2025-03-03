@@ -57,6 +57,8 @@ public class DirMessage {
 
 	private InetSocketAddress serverPort;
 	private List<FileInfo> fileList;
+	private String FileNamesubString;
+	private List<InetSocketAddress> serverList;
 	
 
 	public DirMessage(String op) {
@@ -126,6 +128,32 @@ public class DirMessage {
 	 public int getServerPort() {
 		 return this.serverPort.getPort();
 	 }
+	
+	 public void setServerList(List<InetSocketAddress> serverList) {
+		if (!operation.equals(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK)) {
+			throw new RuntimeException(
+					"DirMessage: setServerList called for message of unexpected type (" + operation + ")");
+			
+		}
+		 this.serverList=serverList;
+	 }
+	 public List<InetSocketAddress> getServerList(){
+		 return this.serverList;
+	 }
+	 public void setFileNameSubString(String subString) {
+		 if (!operation.equals(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE)) {
+				throw new RuntimeException(
+						"DirMessage: setFileNameSubString called for message of unexpected type (" + operation + ")");
+			}
+		 this.FileNamesubString=subString;
+	 }
+	 public String getFileNameSubString() {
+		if (!operation.equals(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE)) {
+			throw new RuntimeException(
+					"DirMessage: getFileNameSubString called for message of unexpected type (" + operation + ")");
+		}
+		 return this.FileNamesubString;
+	 }
 
 	/**
 	 * Método que convierte un mensaje codificado como una cadena de caracteres, a
@@ -167,7 +195,7 @@ public class DirMessage {
 					m.setProtocolID(value);
 				break;
 			case FIELDNAME_FILEINFO:
-				if (m != null && m.operation.equals(DirMessageOps.OPERATION_GET_FILELIST_OK)) {
+				if (m != null && m.operation.equals(DirMessageOps.OPERATION_GET_FILELIST_OK) || m.operation.equals(DirMessageOps.OPERATION_REGISTER_FILESERVER)) {
 					if (m.fileList == null) {
                         m.fileList = new ArrayList<>();
                     }
@@ -180,7 +208,25 @@ public class DirMessage {
                     }
                 }
                 break;
-
+			case FIELDNAME_SERVERPORT:
+				if(m!=null && m.operation.equals(DirMessageOps.OPERATION_REGISTER_FILESERVER)) {
+					m.setServerPort(Integer.parseInt(value));
+				}
+				
+				if(m!=null && m.operation.equals(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK)) {
+					if(m.serverList==null) {
+						m.serverList=new ArrayList<InetSocketAddress>();
+					}
+					m.serverList.add(new InetSocketAddress(Integer.parseInt(value)));
+				}
+				break;
+			case FIELDNAME_FILENAME:
+				if(m!=null && m.operation.equals(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE)) {
+					m.setFileNameSubString(value);
+				}
+				break;
+			
+			
 			default:
 				System.err.println("PANIC: DirMessage.fromString - message with unknown field name " + fieldName);
 				System.err.println("Message was:\n" + message);
@@ -230,7 +276,7 @@ public class DirMessage {
 		}
 		case(DirMessageOps.OPERATION_REGISTER_FILESERVER):{
 			sb.append(FIELDNAME_SERVERPORT+DELIMITER+getServerPort()+END_LINE);
-			sb.append(FIELDNAME_FILELIST+DELIMITER+END_LINE);
+			
 			if(fileList!=null) {
 				for(FileInfo fi:fileList) {
 					sb.append(FIELDNAME_FILEINFO+DELIMITER+fi.fileName+","+fi.fileSize+","+fi.fileHash+END_LINE);
@@ -242,10 +288,20 @@ public class DirMessage {
 			
 			break;
 		}
+		case(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE):{
+			sb.append(FIELDNAME_FILENAME+DELIMITER+FileNamesubString+END_LINE);
+			break;
 		}
-		
-		
-
+				
+		case(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK):{
+			if(serverList!=null) {
+				for(InetSocketAddress server:serverList) {
+					sb.append(FIELDNAME_SERVERPORT+DELIMITER+server.getPort()+END_LINE);
+				}
+			}
+			break;
+		}
+		}
 		sb.append(END_LINE); // Marcamos el final del mensaje
 		return sb.toString();
 	}

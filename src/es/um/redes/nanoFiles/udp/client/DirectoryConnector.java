@@ -392,7 +392,39 @@ public class DirectoryConnector {
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		InetSocketAddress[] serversList = new InetSocketAddress[0];
 
-
+		DirMessage mensajeEnviar= new DirMessage(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE);
+		mensajeEnviar.setFileNameSubString(filenameSubstring);
+		
+		/* 2.Convertir el objeto DirMessage a enviar a un string (método toString)*/
+		String mensajeString = mensajeEnviar.toString();
+		
+		
+		/* 3.Crear un datagrama con los bytes en que se codifica la cadena : */
+		
+		byte[] bytesDatagrama = mensajeString.getBytes();
+		
+		/*4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams). :*/
+		
+		byte[] dataFromServer=sendAndReceiveDatagrams(bytesDatagrama);
+		
+		if (dataFromServer == null || dataFromServer.length == 0) {
+	        System.err.println("Error: No se recibió respuesta del servidor.");
+	        return serversList;
+	    }
+		
+		/* 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)*/
+		String messageFromServer = new String(dataFromServer, 0, dataFromServer.length);
+		DirMessage respuesta = DirMessage.fromString(messageFromServer);
+		
+		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
+		 * de la operación
+		 */
+		
+		if (respuesta != null && DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK.equals(respuesta.getOperation())) {
+			List<InetSocketAddress> servers = respuesta.getServerList();
+			serversList = servers.toArray(new InetSocketAddress[servers.size()]);
+	        
+	    }
 
 		return serversList;
 	}
@@ -405,8 +437,6 @@ public class DirectoryConnector {
 	 */
 	public boolean unregisterFileServer() {
 		boolean success = false;
-
-
 
 
 		return success;
