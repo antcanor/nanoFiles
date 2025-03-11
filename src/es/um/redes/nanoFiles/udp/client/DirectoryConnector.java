@@ -343,11 +343,6 @@ public class DirectoryConnector {
 	public FileInfo[] getFileList() {
 		FileInfo[] filelist = null;
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
-		/*
-		 * TODO: (Boletín MensajesASCII) Hacer ping al directorio 1.Crear el mensaje a
-		 * enviar (objeto DirMessage) con atributos adecuados (operation, etc.) NOTA:
-		 * Usar como operaciones las constantes definidas en la clase DirMessageOps :
-		 */
 		
 		DirMessage mensajeEnviar= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST);		
 		/* 2.Convertir el objeto DirMessage a enviar a un string (método toString)*/
