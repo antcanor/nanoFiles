@@ -98,9 +98,9 @@ public class NFServer implements Runnable {
 
 		while (!stopServer) {
 			try {
-				Socket socket = serverSocket.accept();
-				System.out.println("New client connected: " + socket.getInetAddress().toString() + ":" + socket.getPort());
-				NFServerThread hilo = new NFServerThread(socket);
+				Socket socketCliente = serverSocket.accept();
+				System.out.println("New client connected: " + socketCliente.getInetAddress().toString() + ":" + socketCliente.getPort());
+				NFServerThread hilo = new NFServerThread(socketCliente);
 				hilo.start();
 			} catch (IOException e) {
 				System.err.println("Error al aceptar la conexión con el cliente: " + e.getMessage());
