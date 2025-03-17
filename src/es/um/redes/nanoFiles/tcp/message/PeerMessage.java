@@ -24,7 +24,9 @@ public class PeerMessage {
 	 * específicos para crear mensajes con otros campos, según sea necesario
 	 * 
 	 */
-
+	private byte[] hash;
+	private byte[] fileName;
+	private byte[] fileData;
 
 
 
@@ -46,7 +48,33 @@ public class PeerMessage {
 		return opcode;
 	}
 
+	public byte[] getHash() {
+		return this.hash;
+	}
 
+	public byte[] getFileNname() {
+		return this.fileName;
+	}
+
+	public byte[] getFileData() {
+		return this.fileData;
+	}
+
+	public void setOpcode(byte opcode) {
+		this.opcode = opcode;
+	}
+
+	public void setHash(byte[] hash) {
+		this.hash = hash;
+	}
+
+	public void setFileName(byte[] fileName) {
+		this.fileName = fileName;
+	}
+
+	public void setFileData(byte[] fileData) {
+		this.fileData = fileData;
+	}
 
 
 
@@ -70,9 +98,34 @@ public class PeerMessage {
 		 */
 		PeerMessage message = new PeerMessage();
 		byte opcode = dis.readByte();
+		message.setOpcode(opcode);
+		int hashLength;
+		byte[] hashBuffer;
 		switch (opcode) {
-
-
+			case PeerMessageOps.FILE_NOT_FOUND:
+				break;
+			case PeerMessageOps.DOWNLOAD_FILE:
+				hashLength = dis.readInt();
+				hashBuffer = new byte[hashLength];
+				dis.readFully(hashBuffer);
+				int nameLength = dis.readInt();
+				byte[] nameBuffer = new byte[nameLength];
+				dis.readFully(nameBuffer);
+				message.setHash(hashBuffer);
+				message.setFileName(nameBuffer);
+				break;
+			case PeerMessageOps.FILE:
+				int dataLength = dis.readInt();
+				byte[] dataBuffer = new byte[dataLength];
+				dis.readFully(dataBuffer);
+				message.setFileData(dataBuffer);
+				break;
+			case PeerMessageOps.END_OF_FILE:
+				hashLength = dis.readInt();
+				hashBuffer = new byte[hashLength];
+				dis.readFully(hashBuffer);
+				message.setHash(hashBuffer);
+				break;
 
 		default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
@@ -93,9 +146,22 @@ public class PeerMessage {
 
 		dos.writeByte(opcode);
 		switch (opcode) {
-
-
-
+			case PeerMessageOps.FILE_NOT_FOUND:
+				break;
+			case PeerMessageOps.DOWNLOAD_FILE:
+				dos.writeInt(hash.length);
+				dos.write(hash);
+				dos.writeInt(fileName.length);
+				dos.write(fileName);
+				break;
+			case PeerMessageOps.FILE:
+				dos.writeInt(fileData.length);
+				dos.write(fileData);
+				break;
+			case PeerMessageOps.END_OF_FILE:
+				dos.writeInt(hash.length);
+				dos.write(hash);
+				break;
 
 		default:
 			System.err.println("PeerMessage.writeMessageToOutputStream found unexpected message opcode " + opcode + "("
