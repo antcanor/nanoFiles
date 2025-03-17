@@ -52,7 +52,7 @@ public class PeerMessage {
 		return this.hash;
 	}
 
-	public byte[] getFileNname() {
+	public byte[] getFileName() {
 		return this.fileName;
 	}
 
