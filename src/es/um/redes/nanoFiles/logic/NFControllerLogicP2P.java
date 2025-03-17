@@ -6,8 +6,9 @@ import es.um.redes.nanoFiles.tcp.client.NFConnector;
 import es.um.redes.nanoFiles.application.NanoFiles;
 
 
-
+import java.io.File;
 import es.um.redes.nanoFiles.tcp.server.NFServer;
+import es.um.redes.nanoFiles.util.FileDigest;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 public class NFControllerLogicP2P {
@@ -51,6 +52,23 @@ public class NFControllerLogicP2P {
 			 * programa
 			 * 
 			 */
+			try {
+				fileServer = new NFServer();
+				Thread serverThread = new Thread(fileServer);
+				serverThread.start();
+				serverRunning = true;
+				if (serverRunning) {
+					System.out.println("File server running on port " + fileServer.getPort());
+				} else {
+					System.err.println("Cannot start the file server");
+					fileServer = null;
+					
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.err.println("Cannot start the file server");
+				fileServer = null;
+			}
 
 
 
@@ -139,6 +157,20 @@ public class NFControllerLogicP2P {
 		 * método. Si se produce una excepción de entrada/salida (error del que no es
 		 * posible recuperarse), se debe informar sin abortar el programa
 		 */
+		File file = new File(localFileName);
+		if (file.exists()) {
+			System.err.println("* File already exists: " + localFileName);
+			return false;
+		}
+		 try {
+			NFConnector[] connectors = new NFConnector[serverAddressList.length];
+			
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("* Error downloading file: " + localFileName);
+		}
 
 
 
