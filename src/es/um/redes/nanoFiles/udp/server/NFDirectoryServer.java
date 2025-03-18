@@ -3,6 +3,7 @@ package es.um.redes.nanoFiles.udp.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
@@ -221,7 +222,8 @@ public class NFDirectoryServer {
 		 * consecuencia, enviando uno u otro tipo de mensaje en respuesta.
 		 */
 		String operation = mensajeRecibido.getOperation();
-
+		InetAddress hostAddress = pkt.getAddress();
+		System.out.println("Operation: " + operation + " from " + hostAddress);
 		/*
 		 * TODO: (Boletín MensajesASCII) Construir un objeto DirMessage (msgToSend) con
 		 * la respuesta a enviar al cliente, en función del tipo de mensaje recibido,
@@ -264,7 +266,8 @@ public class NFDirectoryServer {
 		case DirMessageOps.OPERATION_REGISTER_FILESERVER:{
 			FileInfo[] listaFicheros = mensajeRecibido.getFileList();
 			int serverPort = mensajeRecibido.getServerPort();
-			InetSocketAddress server = new InetSocketAddress(serverPort);
+			InetSocketAddress server = new InetSocketAddress(hostAddress, serverPort);
+			System.out.println("Server address: "+server.toString());
 			for(FileInfo f:listaFicheros) {
 				String fileHash = f.fileHash;
 				if (fileInfoMap.containsKey(fileHash)) {

@@ -157,7 +157,7 @@ public class NFControllerLogicP2P {
 		 * método. Si se produce una excepción de entrada/salida (error del que no es
 		 * posible recuperarse), se debe informar sin abortar el programa
 		 */
-		File file = new File(localFileName);
+		/*File file = new File(localFileName);
 		if (file.exists()) {
 			System.err.println("* File already exists: " + localFileName);
 			return false;
@@ -170,7 +170,7 @@ public class NFControllerLogicP2P {
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("* Error downloading file: " + localFileName);
-		}
+		}*/
 
 
 
