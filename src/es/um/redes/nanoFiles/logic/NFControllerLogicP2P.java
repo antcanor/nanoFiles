@@ -142,6 +142,10 @@ public class NFControllerLogicP2P {
 			System.err.println("* Cannot start download - No list of server addresses provided");
 			return false;
 		}
+		System.out.println("Ha llegado con éxito a la función downloadFileFromServers");
+		System.out.println("serverAddressList.length: " + serverAddressList.length);
+		System.out.println("targetFileNameSubstring: " + targetFileNameSubstring);
+		System.out.println("localFileName: " + localFileName);
 		/*
 		 * TODO: Crear un objeto NFConnector distinto para establecer una conexión TCP
 		 * con cada servidor de ficheros proporcionado, y usar dicho objeto para
@@ -173,7 +177,7 @@ public class NFControllerLogicP2P {
 		}*/
 
 
-
+		System.out.println("Downloading file from servers...");
 
 		return downloaded;
 	}
