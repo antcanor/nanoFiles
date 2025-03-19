@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
 import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
+import es.um.redes.nanoFiles.udp.server.NFDirectoryServer;
 import es.um.redes.nanoFiles.util.FileDigest;
 
 //Esta clase proporciona la funcionalidad necesaria para intercambiar mensajes entre el cliente y el servidor
@@ -57,6 +58,67 @@ public class NFConnector {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public boolean downloadFile(String targetFileHashSubstr, File file) throws IOException {
+		boolean downloaded = false;
+		
+		/*
+		 * TODO: Recibir mensajes del servidor a través del "dis" del socket usando
+		 * PeerMessage.readMessageFromInputStream, y actuar en función del tipo de
+		 * mensaje recibido, extrayendo los valores necesarios de los atributos del
+		 * objeto (valores de los campos del mensaje).
+		 */
+		/*
+		 * TODO: Para escribir datos de un fichero recibidos en un mensaje, se puede
+		 * crear un FileOutputStream a partir del parámetro "file" para escribir cada
+		 * fragmento recibido (array de bytes) en el fichero mediante el método "write".
+		 * Cerrar el FileOutputStream una vez se han escrito todos los fragmentos.
+		 */
+		/*
+		 * NOTA: Hay que tener en cuenta que puede que la subcadena del hash pasada como
+		 * parámetro no identifique unívocamente ningún fichero disponible en el
+		 * servidor (porque no concuerde o porque haya más de un fichero coincidente con
+		 * dicha subcadena)
+		 */
+		
+
+		PeerMessage request = new PeerMessage(PeerMessageOps.DOWNLOAD_FILE);
+		request.setFileName(targetFileHashSubstr.getBytes());
+		String hash = NFDirectoryServer.getFileHasgByFileNameSubString(targetFileHashSubstr);
+		request.setHash(hash.getBytes());
+		//request.setHash(FileDigest.getHash(targetFileHashSubstr));
+		request.writeMessageToOutputStream(dos);
+
+		FileOutputStream fos = new FileOutputStream(file);
+
+		boolean endOfFile = false;
+		while (!endOfFile) {
+			PeerMessage response = PeerMessage.readMessageFromInputStream(dis);
+			switch (response.getOpcode()) {
+			case PeerMessageOps.FILE_NOT_FOUND:
+				System.err.println("* File not found in server.");
+				endOfFile = true;
+				break;
+			case PeerMessageOps.FILE:
+				fos.write(response.getFileData(), 0, response.getFileData().length);
+				break;
+			case PeerMessageOps.END_OF_FILE:
+				endOfFile = true;
+				downloaded = true;
+
+
+				break;
+			default:
+				System.err.println("* Unexpected response opcode: " + response.getOpcode());
+				endOfFile = true;
+				break;
+			}
+		}
+
+		fos.close();
+
+		return downloaded;
 	}
 
 

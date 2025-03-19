@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,9 +35,9 @@ public class NFDirectoryServer {
 	 * registrados, etc.
 	 */
 
-	private Map<FileInfo, LinkedList<InetSocketAddress>> files; //Mapa de ficheros y servidores que los tienen
+	private static Map<FileInfo, LinkedList<InetSocketAddress>> files; //Mapa de ficheros y servidores que los tienen
 	private Map<InetSocketAddress, LinkedList<FileInfo>> servers; //Mapa de servidores y ficheros que tienen
-	private Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
+	private static Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
 
 	/**
 	 * Probabilidad de descartar un mensaje recibido en el directorio (para simular
@@ -222,8 +223,8 @@ public class NFDirectoryServer {
 		 * consecuencia, enviando uno u otro tipo de mensaje en respuesta.
 		 */
 		String operation = mensajeRecibido.getOperation();
-		InetAddress hostAddress = pkt.getAddress();
-		System.out.println("Operation: " + operation + " from " + hostAddress);
+		InetSocketAddress clientAddress = (InetSocketAddress) pkt.getSocketAddress();
+		System.out.println("Operation: " + operation + " from " + clientAddress);
 		/*
 		 * TODO: (Boletín MensajesASCII) Construir un objeto DirMessage (msgToSend) con
 		 * la respuesta a enviar al cliente, en función del tipo de mensaje recibido,
@@ -266,8 +267,8 @@ public class NFDirectoryServer {
 		case DirMessageOps.OPERATION_REGISTER_FILESERVER:{
 			FileInfo[] listaFicheros = mensajeRecibido.getFileList();
 			int serverPort = mensajeRecibido.getServerPort();
-			InetSocketAddress server = new InetSocketAddress(hostAddress, serverPort);
-			System.out.println("Server address: "+server.toString());
+			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), 10000);
+			System.out.println("Server address: "+server.getAddress().getHostAddress()+" Server port: "+server.getPort());
 			for(FileInfo f:listaFicheros) {
 				String fileHash = f.fileHash;
 				if (fileInfoMap.containsKey(fileHash)) {
@@ -346,5 +347,14 @@ public class NFDirectoryServer {
 		DatagramPacket datagramaEnviar = new DatagramPacket(pktEnvio, pktEnvio.length,pkt.getSocketAddress());	
 		socket.send(datagramaEnviar);
 
+	}
+
+	public static String getFileHasgByFileNameSubString(String subString){
+		for(FileInfo f : files.keySet()) {
+			if(f.fileName.contains(subString)) {
+				return f.fileHash;
+			}
+		}
+		return null;
 	}
 }

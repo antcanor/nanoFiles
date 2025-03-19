@@ -161,24 +161,31 @@ public class NFControllerLogicP2P {
 		 * método. Si se produce una excepción de entrada/salida (error del que no es
 		 * posible recuperarse), se debe informar sin abortar el programa
 		 */
-		/*File file = new File(localFileName);
+		File file = new File(localFileName);
 		if (file.exists()) {
 			System.err.println("* File already exists: " + localFileName);
 			return false;
 		}
 		 try {
 			NFConnector[] connectors = new NFConnector[serverAddressList.length];
-			
+			for (int i = 0; i < serverAddressList.length; i++) {
+				System.out.println("Connecting to server: " + serverAddressList[i]);
+				connectors[i] = new NFConnector(serverAddressList[i]);
+				boolean result = connectors[i].downloadFile(targetFileNameSubstring, file);
+				System.out.println("Download result from server " + serverAddressList[i] + ": " + result);
+			}
+
+			String checksum = FileDigest.computeFileChecksumString(file.getPath());
+			System.out.println("File downloaded successfully: " + localFileName);
+			System.out.println("Checksum: " + checksum);
+			downloaded = true;
 			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("* Error downloading file: " + localFileName);
-		}*/
-
-
-		System.out.println("Downloading file from servers...");
-
+		}
+		
 		return downloaded;
 	}
 
@@ -192,8 +199,9 @@ public class NFControllerLogicP2P {
 		/*
 		 * TODO: Devolver el puerto de escucha de nuestro servidor de ficheros
 		 */
-
-
+		if (fileServer != null) {
+			port = fileServer.getPort();
+		}
 
 		return port;
 	}
@@ -206,8 +214,10 @@ public class NFControllerLogicP2P {
 		/*
 		 * TODO: Enviar señal para detener nuestro servidor de ficheros en segundo plano
 		 */
-
-
+		if (fileServer != null) {
+			fileServer.stopServer();
+			fileServer = null;
+		}
 
 	}
 

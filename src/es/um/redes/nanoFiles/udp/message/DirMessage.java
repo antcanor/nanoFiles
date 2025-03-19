@@ -220,7 +220,9 @@ public class DirMessage {
 					if(m.serverList==null) {
 						m.serverList=new ArrayList<InetSocketAddress>();
 					}
-					m.serverList.add(new InetSocketAddress(Integer.parseInt(value)));
+					String[] server=value.split(",");
+					m.serverList.add(new InetSocketAddress(server[0],Integer.parseInt(server[1])));
+					//m.serverList.add(new InetSocketAddress(Integer.parseInt(value)));
 				}
 				break;
 			case FIELDNAME_FILENAME:
@@ -299,7 +301,7 @@ public class DirMessage {
 		case(DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK):{
 			if(serverList!=null) {
 				for(InetSocketAddress server:serverList) {
-					sb.append(FIELDNAME_SERVERPORT+DELIMITER+server.getPort()+END_LINE);
+					sb.append(FIELDNAME_SERVERPORT+DELIMITER+server.getAddress().getHostName()+","+server.getPort()+END_LINE);
 				}
 			}
 			break;
