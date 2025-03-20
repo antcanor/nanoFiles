@@ -162,6 +162,7 @@ public class NFControllerLogicP2P {
 		 * posible recuperarse), se debe informar sin abortar el programa
 		 */
 		File file = new File(localFileName);
+		System.out.println(file.getAbsolutePath());
 		if (file.exists()) {
 			System.err.println("* File already exists: " + localFileName);
 			return false;

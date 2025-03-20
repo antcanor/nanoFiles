@@ -25,6 +25,7 @@ public class NFServerThread extends Thread {
 		} finally {
 			try {
 				clientSocket.close();
+				System.out.println("Se ha cerrado: " +clientSocket.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

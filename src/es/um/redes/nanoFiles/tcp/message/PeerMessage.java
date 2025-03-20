@@ -149,8 +149,8 @@ public class PeerMessage {
 			case PeerMessageOps.FILE_NOT_FOUND:
 				break;
 			case PeerMessageOps.DOWNLOAD_FILE:
-				dos.writeInt(hash.length);
-				dos.write(hash);
+				//dos.writeInt(hash.length);
+				//dos.write(hash);
 				dos.writeInt(fileName.length);
 				dos.write(fileName);
 				break;
