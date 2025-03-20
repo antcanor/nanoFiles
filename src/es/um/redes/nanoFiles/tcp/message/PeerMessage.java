@@ -105,13 +105,13 @@ public class PeerMessage {
 			case PeerMessageOps.FILE_NOT_FOUND:
 				break;
 			case PeerMessageOps.DOWNLOAD_FILE:
-				hashLength = dis.readInt();
-				hashBuffer = new byte[hashLength];
-				dis.readFully(hashBuffer);
+				//hashLength = dis.readInt();
+				//hashBuffer = new byte[hashLength];
+				//dis.readFully(hashBuffer);
 				int nameLength = dis.readInt();
 				byte[] nameBuffer = new byte[nameLength];
 				dis.readFully(nameBuffer);
-				message.setHash(hashBuffer);
+				//message.setHash(hashBuffer);
 				message.setFileName(nameBuffer);
 				break;
 			case PeerMessageOps.FILE:

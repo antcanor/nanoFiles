@@ -60,7 +60,7 @@ public class NFConnector {
 		
 	}
 
-	public boolean downloadFile(String targetFileHashSubstr, File file) throws IOException {
+	public boolean downloadFile(String targetFilenameSubstr, File file) throws IOException {
 		boolean downloaded = false;
 		
 		/*
@@ -84,10 +84,7 @@ public class NFConnector {
 		
 
 		PeerMessage request = new PeerMessage(PeerMessageOps.DOWNLOAD_FILE);
-		request.setFileName(targetFileHashSubstr.getBytes());
-		String hash = NFDirectoryServer.getFileHasgByFileNameSubString(targetFileHashSubstr);
-		request.setHash(hash.getBytes());
-		//request.setHash(FileDigest.getHash(targetFileHashSubstr));
+		request.setFileName(targetFilenameSubstr.getBytes());
 		request.writeMessageToOutputStream(dos);
 
 		FileOutputStream fos = new FileOutputStream(file);
