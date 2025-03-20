@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class NFDirectoryServer {
 
 	private static Map<FileInfo, LinkedList<InetSocketAddress>> files; //Mapa de ficheros y servidores que los tienen
 	private Map<InetSocketAddress, LinkedList<FileInfo>> servers; //Mapa de servidores y ficheros que tienen
-	private static Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
+	private Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
 
 	/**
 	 * Probabilidad de descartar un mensaje recibido en el directorio (para simular
@@ -64,7 +65,7 @@ public class NFDirectoryServer {
 		 * servidor de directorio: ficheros, etc.)
 		 */
 
-		this.files= new HashMap<FileInfo, LinkedList<InetSocketAddress>>();
+		files= new HashMap<FileInfo, LinkedList<InetSocketAddress>>();
 		this.servers = new HashMap<InetSocketAddress, LinkedList<FileInfo>>();
 		this.fileInfoMap = new HashMap<String, LinkedList<FileInfo>>();
 
@@ -267,7 +268,7 @@ public class NFDirectoryServer {
 		case DirMessageOps.OPERATION_REGISTER_FILESERVER:{
 			FileInfo[] listaFicheros = mensajeRecibido.getFileList();
 			int serverPort = mensajeRecibido.getServerPort();
-			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), 10000);
+			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), serverPort);
 			System.out.println("Server address: "+server.getAddress().getHostAddress()+" Server port: "+server.getPort());
 			for(FileInfo f:listaFicheros) {
 				String fileHash = f.fileHash;
@@ -350,9 +351,10 @@ public class NFDirectoryServer {
 	}
 
 	public static String getFileHasgByFileNameSubString(String subString){
-		for(FileInfo f : files.keySet()) {
-			if(f.fileName.contains(subString)) {
-				return f.fileHash;
+		Map<FileInfo, LinkedList<InetSocketAddress>> f = Collections.unmodifiableMap(files);
+		for(FileInfo fi : f.keySet()) {
+			if(fi.fileName.contains(subString)) {
+				return fi.fileHash;
 			}
 		}
 		return null;
