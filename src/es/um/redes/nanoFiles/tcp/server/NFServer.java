@@ -101,13 +101,14 @@ public class NFServer implements Runnable {
 				Socket socketCliente = serverSocket.accept();
 				System.out.println("New client connected: " + socketCliente.getInetAddress().toString() + ":" + socketCliente.getPort());
 				NFServerThread hilo = new NFServerThread(socketCliente);
-				hilo.start();
+				hilo.run();
 			} catch (IOException e) {
 				System.err.println("Error al aceptar la conexión con el cliente: " + e.getMessage());
 			}
 
-		System.out.println("* Server stopped.");
+		
 		}
+		System.out.println("* Server stopped.");
 		/*
 		 * TODO: (Boletín SocketsTCP) Al establecerse la conexión con un peer, la
 		 * comunicación con dicho cliente se hace en el método
