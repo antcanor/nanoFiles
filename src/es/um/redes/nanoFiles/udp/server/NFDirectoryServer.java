@@ -329,6 +329,25 @@ public class NFDirectoryServer {
 			break;
 			
 		}
+		case DirMessageOps.OPERATION_UNREGISTER_FILESERVER:{
+			int serverPort = mensajeRecibido.getServerPort();
+			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), serverPort);
+			LinkedList<FileInfo> listaFicheros = servers.get(server);
+			for(FileInfo f:listaFicheros) {
+				files.get(f).remove(server);
+				if(files.get(f).isEmpty()) {
+					files.remove(f);
+				}
+				fileInfoMap.get(f.fileHash).remove(f);
+				if(fileInfoMap.get(f.fileHash).isEmpty()) {
+					fileInfoMap.remove(f.fileHash);
+				}
+			}
+			servers.remove(server);
+			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_UNREGISTER_FILESERVER_OK);
+			System.out.println(mensajeRespuesta.toString());
+			break;
+		}
 		
 
 

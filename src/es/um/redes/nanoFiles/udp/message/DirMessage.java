@@ -306,6 +306,12 @@ public class DirMessage {
 			}
 			break;
 		}
+		case(DirMessageOps.OPERATION_UNREGISTER_FILESERVER):{
+			break;
+		}
+		case(DirMessageOps.OPERATION_UNREGISTER_FILESERVER_OK):{
+			break;
+		}
 		}
 		sb.append(END_LINE); // Marcamos el final del mensaje
 		return sb.toString();
