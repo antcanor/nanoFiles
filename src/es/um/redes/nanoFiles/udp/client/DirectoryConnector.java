@@ -110,7 +110,7 @@ public class DirectoryConnector {
 			try {
 				socket.send(packetToServer);
 				
-				socket.setSoTimeout(2000);
+				socket.setSoTimeout(TIMEOUT);
 				socket.receive(paquetesDelServidor);	
 				hayRespuesta=true;
 			}catch (SocketTimeoutException e) {
