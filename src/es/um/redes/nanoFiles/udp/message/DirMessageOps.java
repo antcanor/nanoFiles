@@ -19,6 +19,8 @@ public class DirMessageOps {
 	public static final String OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK = "servers_sharing_ok";
 	public static final String OPERATION_UNREGISTER_FILESERVER = "unregister_fileserver";
 	public static final String OPERATION_UNREGISTER_FILESERVER_OK = "unregister_fileserver_ok";
+	public static final String OPERATION_UNREGISTER_FILESERVER_FAILED = "unregister_fileserver_failed";
+
 	
 
 

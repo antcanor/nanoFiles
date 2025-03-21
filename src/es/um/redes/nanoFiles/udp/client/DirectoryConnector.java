@@ -456,7 +456,10 @@ public class DirectoryConnector {
 		
 		if (respuesta != null && DirMessageOps.OPERATION_UNREGISTER_FILESERVER_OK.equals(respuesta.getOperation())) {
 	        success = true;
-	    }
+	    }else if (respuesta != null && DirMessageOps.OPERATION_UNREGISTER_FILESERVER_FAILED.equals(respuesta.getOperation())) {
+	        success = false;
+			
+		}
 
 		return success;
 	}
