@@ -330,8 +330,8 @@ public class NFDirectoryServer {
 			
 		}
 		case DirMessageOps.OPERATION_UNREGISTER_FILESERVER:{
-			InetSocketAddress serverAddr = new InetSocketAddress(clientAddress.getAddress().getHostName(), mensajeRecibido.getServerPort());
-			InetAddress address = serverAddr.getAddress();
+			//InetSocketAddress serverAddr = new InetSocketAddress(clientAddress.getAddress().getHostName(), clientAddress.getPort());
+			InetAddress address = clientAddress.getAddress();
 			//Comprobar si existe algun server con esa direccion
 			InetSocketAddress server = null;
 			for(InetSocketAddress s:servers.keySet()) {
