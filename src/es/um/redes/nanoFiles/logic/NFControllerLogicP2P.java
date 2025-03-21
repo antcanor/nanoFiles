@@ -225,7 +225,8 @@ public class NFControllerLogicP2P {
 	protected boolean serving() {
 		boolean result = false;
 
-
+		if(fileServer!=null)
+			result = true;
 
 		return result;
 

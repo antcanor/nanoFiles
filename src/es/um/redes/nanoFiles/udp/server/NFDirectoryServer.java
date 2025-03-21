@@ -330,8 +330,7 @@ public class NFDirectoryServer {
 			
 		}
 		case DirMessageOps.OPERATION_UNREGISTER_FILESERVER:{
-			int serverPort = mensajeRecibido.getServerPort();
-			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), serverPort);
+			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(),clientAddress.getPort());
 			LinkedList<FileInfo> listaFicheros = servers.get(server);
 			for(FileInfo f:listaFicheros) {
 				files.get(f).remove(server);
