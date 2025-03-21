@@ -270,32 +270,35 @@ public class NFDirectoryServer {
 			int serverPort = mensajeRecibido.getServerPort();
 			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), serverPort);
 			System.out.println("Server address: "+server.getAddress().getHostAddress()+" Server port: "+server.getPort());
-			for(FileInfo f:listaFicheros) {
-				String fileHash = f.fileHash;
-				if (fileInfoMap.containsKey(fileHash)) {
-					fileInfoMap.get(fileHash).add(f);
+			if (!servers.containsKey(server)) {
+				for(FileInfo f:listaFicheros) {
+					String fileHash = f.fileHash;
+					if (fileInfoMap.containsKey(fileHash)) {
+						fileInfoMap.get(fileHash).add(f);
+						
+					}else {
+						LinkedList<FileInfo> lista = new LinkedList<FileInfo>();
+						lista.add(f);
+						fileInfoMap.put(fileHash, lista);
+					} 
 					
-				}else {
-					LinkedList<FileInfo> lista = new LinkedList<FileInfo>();
-					lista.add(f);
-					fileInfoMap.put(fileHash, lista);
-				} 
-				
-				if(files.containsKey(f)) {
-					files.get(f).add(server);
-				}else {
-					LinkedList<InetSocketAddress> servidores = new LinkedList<InetSocketAddress>();
-					servidores.add(server);
-					files.put(f, servidores);
+					if(files.containsKey(f)) {
+						files.get(f).add(server);
+					}else {
+						LinkedList<InetSocketAddress> servidores = new LinkedList<InetSocketAddress>();
+						servidores.add(server);
+						files.put(f, servidores);
+					}
 				}
+				if(servers.containsKey(server)) {
+					servers.get(server).addAll(Arrays.asList(listaFicheros));
+				}else {
+					LinkedList<FileInfo> ficheros = new LinkedList<>(Arrays.asList(listaFicheros));
+					servers.put(server, ficheros);
+				}
+				
 			}
-			if(servers.containsKey(server)) {
-				servers.get(server).addAll(Arrays.asList(listaFicheros));
-			}else {
-				LinkedList<FileInfo> ficheros = new LinkedList<>(Arrays.asList(listaFicheros));
-				servers.put(server, ficheros);
-			}
-
+			
 			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_REGISTER_FILESERVER_OK);
 			System.out.println(mensajeRespuesta.toString());
 			break;
