@@ -196,7 +196,7 @@ public class NFServer implements Runnable {
 				if(filesConNombre.length == 0) {
 					respuesta = new PeerMessage(PeerMessageOps.FILE_NOT_FOUND);
 					respuesta.writeMessageToOutputStream(dos);
-				} else if(filesConNombre.length == 1) {
+				} else if(filesConNombre.length >= 1) {
 					String hash = filesConNombre[0].fileHash;
 					String path = NanoFiles.db.lookupFilePath(hash);
 					sendFileChunk(path, dos, hash);

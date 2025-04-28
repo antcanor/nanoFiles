@@ -164,20 +164,20 @@ public class NFControllerLogicP2P {
 		File file = new File(localFileName);
 		System.out.println(file.getAbsolutePath());
 		if (file.exists()) {
-			System.err.println("* File already exists: " + localFileName);
+			System.err.println("El archivo ya existe: " + localFileName);
 			return false;
 		}
 		 try {
 			NFConnector[] connectors = new NFConnector[serverAddressList.length];
 			for (int i = 0; i < serverAddressList.length; i++) {
-				System.out.println("Connecting to server: " + serverAddressList[i]);
+				System.out.println("Conectando al servidor: " + serverAddressList[i]);
 				connectors[i] = new NFConnector(serverAddressList[i]);
 				boolean result = connectors[i].downloadFile(targetFileNameSubstring, file);
-				System.out.println("Download result from server " + serverAddressList[i] + ": " + result);
+				System.out.println("Resultado de la descarga del servidor " + serverAddressList[i] + ": " + result);
 			}
 
 			String checksum = FileDigest.computeFileChecksumString(file.getPath());
-			System.out.println("File downloaded successfully: " + localFileName);
+			System.out.println("Archivo descargado satisfactoriamente: " + localFileName);
 			System.out.println("Checksum: " + checksum);
 			downloaded = true;
 			
