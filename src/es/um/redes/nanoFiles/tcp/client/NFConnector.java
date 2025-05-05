@@ -75,12 +75,6 @@ public class NFConnector {
 		 * fragmento recibido (array de bytes) en el fichero mediante el método "write".
 		 * Cerrar el FileOutputStream una vez se han escrito todos los fragmentos.
 		 */
-		/*
-		 * NOTA: Hay que tener en cuenta que puede que la subcadena del hash pasada como
-		 * parámetro no identifique unívocamente ningún fichero disponible en el
-		 * servidor (porque no concuerde o porque haya más de un fichero coincidente con
-		 * dicha subcadena)
-		 */
 		
 
 		PeerMessage request = new PeerMessage(PeerMessageOps.DOWNLOAD_FILE);
