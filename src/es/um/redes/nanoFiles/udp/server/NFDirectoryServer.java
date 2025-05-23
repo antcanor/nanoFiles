@@ -39,6 +39,7 @@ public class NFDirectoryServer {
 	private static Map<FileInfo, LinkedList<InetSocketAddress>> files; //Mapa de ficheros y servidores que los tienen
 	private Map<InetSocketAddress, LinkedList<FileInfo>> servers; //Mapa de servidores y ficheros que tienen
 	private Map<String, LinkedList<FileInfo>> fileInfoMap; //Mapa de hash de fichero y fichero
+	private static List<InetSocketAddress> clients; //Lista de clientes que se han registrado en el directorio
 
 	/**
 	 * Probabilidad de descartar un mensaje recibido en el directorio (para simular
@@ -68,6 +69,7 @@ public class NFDirectoryServer {
 		files= new HashMap<FileInfo, LinkedList<InetSocketAddress>>();
 		this.servers = new HashMap<InetSocketAddress, LinkedList<FileInfo>>();
 		this.fileInfoMap = new HashMap<String, LinkedList<FileInfo>>();
+		this.clients = new LinkedList<InetSocketAddress>();
 
 
 		if (NanoFiles.testModeUDP) {
@@ -248,7 +250,7 @@ public class NFDirectoryServer {
 				 * el éxito/fracaso del ping (compatible, incompatible), y lo devolvemos como
 				 * resultado del método.
 				 */
-				
+				clients.add(clientAddress);
 				mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_PING_OK);
 				
 			}else {
@@ -266,6 +268,11 @@ public class NFDirectoryServer {
 		}
 
 		case DirMessageOps.OPERATION_REGISTER_FILESERVER:{
+			if(!isClient(clientAddress)) {
+				mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_PING_FAILED);
+				System.out.println(mensajeRespuesta.toString());
+				break;
+			}
 			FileInfo[] listaFicheros = mensajeRecibido.getFileList();
 			int serverPort = mensajeRecibido.getServerPort();
 			InetSocketAddress server = new InetSocketAddress(clientAddress.getAddress().getHostName(), serverPort);
@@ -305,6 +312,11 @@ public class NFDirectoryServer {
 		}
 
 		case DirMessageOps.OPERATION_GET_FILELIST:{
+			if(!isClient(clientAddress)) {
+				mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_PING_FAILED);
+				System.out.println(mensajeRespuesta.toString());
+				break;
+			}
 			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_GET_FILELIST_OK);
 			LinkedList<FileInfo> listaFicheros = new LinkedList<FileInfo>();
 			for(FileInfo f:files.keySet()) {
@@ -318,6 +330,11 @@ public class NFDirectoryServer {
 		}
 
 		case DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE:{
+			if(!isClient(clientAddress)) {
+				mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_PING_FAILED);
+				System.out.println(mensajeRespuesta.toString());
+				break;
+			}
 			String subString = mensajeRecibido.getFileNameSubString();
 			Set<FileInfo> ficheros = files.keySet();
 			LinkedList<InetSocketAddress> servidores = new LinkedList<InetSocketAddress>();
@@ -333,6 +350,11 @@ public class NFDirectoryServer {
 			
 		}
 		case DirMessageOps.OPERATION_UNREGISTER_FILESERVER:{
+			if(!isClient(clientAddress)) {
+				mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_PING_FAILED);
+				System.out.println(mensajeRespuesta.toString());
+				break;
+			}
 			//InetSocketAddress serverAddr = new InetSocketAddress(clientAddress.getAddress().getHostName(), clientAddress.getPort());
 			InetAddress address = clientAddress.getAddress();
 			//Comprobar si existe algun server con esa direccion
@@ -362,6 +384,7 @@ public class NFDirectoryServer {
 			servers.remove(server);
 			mensajeRespuesta= new DirMessage(DirMessageOps.OPERATION_UNREGISTER_FILESERVER_OK);
 			System.out.println(mensajeRespuesta.toString());
+			clients.remove(clientAddress);
 			break;
 		}
 		
@@ -385,13 +408,12 @@ public class NFDirectoryServer {
 
 	}
 
-	public static String getFileHasgByFileNameSubString(String subString){
-		Map<FileInfo, LinkedList<InetSocketAddress>> f = Collections.unmodifiableMap(files);
-		for(FileInfo fi : f.keySet()) {
-			if(fi.fileName.contains(subString)) {
-				return fi.fileHash;
+	private boolean isClient(InetSocketAddress client) {
+		for(InetSocketAddress c:clients) {
+			if(c.equals(client)) {
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
 }

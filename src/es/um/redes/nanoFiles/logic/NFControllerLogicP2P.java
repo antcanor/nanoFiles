@@ -53,7 +53,7 @@ public class NFControllerLogicP2P {
 			 * 
 			 */
 			try {
-				fileServer = new NFServer();
+				fileServer = new NFServer(0);
 				Thread serverThread = new Thread(fileServer);
 				serverThread.start();
 				serverRunning = true;
@@ -86,7 +86,7 @@ public class NFControllerLogicP2P {
 		assert (fileServer == null);
 		try {
 
-			fileServer = new NFServer();
+			fileServer = new NFServer(0);
 			/*
 			 * (Boletín SocketsTCP) Inicialmente, se creará un NFServer y se ejecutará su
 			 * método "test" (servidor minimalista en primer plano, que sólo puede atender a

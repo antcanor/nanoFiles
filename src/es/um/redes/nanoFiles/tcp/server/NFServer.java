@@ -25,20 +25,19 @@ public class NFServer implements Runnable {
 
 	private ServerSocket serverSocket = null;
 
-	public NFServer() throws IOException {
+	public NFServer(int port) throws IOException {
 		/*
 		 * TODO: (Boletín SocketsTCP) Crear una direción de socket a partir del puerto
 		 * especificado (PORT)
-		 */
+		 */		
 		
-		InetSocketAddress socketAddress= new InetSocketAddress(PORT);
+		InetSocketAddress socketAddress= new InetSocketAddress(port);
 		/*
 		 * TODO: (Boletín SocketsTCP) Crear un socket servidor y ligarlo a la dirección
 		 * de socket anterior
 		 */
 		serverSocket= new ServerSocket();
 		serverSocket.bind(socketAddress);
-
 	}
 
 	/**
