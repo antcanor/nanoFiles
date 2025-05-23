@@ -107,11 +107,12 @@ public class NFControllerLogicDir {
 		 * operación.
 		 */
 		FileInfo[] trackedFiles = directoryConnector.getFileList(); //
+		if(trackedFiles == null)
+			return;
 		System.out.println(
 				"* These are the files tracked by the directory at " + directoryConnector.getDirectoryHostname());
-		if(trackedFiles != null) {
-			FileInfo.printToSysout(trackedFiles);
-		}
+		FileInfo.printToSysout(trackedFiles);
+	
 	}
 
 	/**

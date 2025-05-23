@@ -323,7 +323,9 @@ public class DirectoryConnector {
 		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
 		 * de la operación
 		 */
-		
+		if (respuesta != null && DirMessageOps.OPERATION_PING_FAILED.equals(respuesta.getOperation())) {
+			System.err.println("Error: Se debe hacer ping con el directorio, antes de cualquier otro comando.");
+	    }
 		if (respuesta != null && DirMessageOps.OPERATION_REGISTER_FILESERVER_OK.equals(respuesta.getOperation())) {
 	        success = true;
 	    }
@@ -363,7 +365,9 @@ public class DirectoryConnector {
 		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
 		 * de la operación
 		 */
-		
+		if (respuesta != null && DirMessageOps.OPERATION_PING_FAILED.equals(respuesta.getOperation())) {
+			System.err.println("Error: Se debe hacer ping con el directorio, antes de cualquier otro comando.");
+	    }
 		if (respuesta != null && DirMessageOps.OPERATION_GET_FILELIST_OK.equals(respuesta.getOperation())) {
 			FileInfo[] files = respuesta.getFileList();
 			filelist = files;
@@ -414,7 +418,9 @@ public class DirectoryConnector {
 		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
 		 * de la operación
 		 */
-		
+		if (respuesta != null && DirMessageOps.OPERATION_PING_FAILED.equals(respuesta.getOperation())) {
+			System.err.println("Error: Se debe hacer ping con el directorio, antes de cualquier otro comando.");
+	    }
 		if (respuesta != null && DirMessageOps.OPERATION_GET_SERVERS_SHARING_THIS_FILE_OK.equals(respuesta.getOperation())) {
 			List<InetSocketAddress> servers = respuesta.getServerList();
 			serversList = servers.toArray(new InetSocketAddress[servers.size()]);
@@ -453,7 +459,9 @@ public class DirectoryConnector {
 		/* 6.Extraer datos del objeto DirMessage y procesarlos 7.Devolver éxito/fracaso
 		 * de la operación
 		 */
-		
+		if (respuesta != null && DirMessageOps.OPERATION_PING_FAILED.equals(respuesta.getOperation())) {
+			System.err.println("Error: Se debe hacer ping con el directorio, antes de cualquier otro comando.");
+	    }
 		if (respuesta != null && DirMessageOps.OPERATION_UNREGISTER_FILESERVER_OK.equals(respuesta.getOperation())) {
 	        success = true;
 	    }else if (respuesta != null && DirMessageOps.OPERATION_UNREGISTER_FILESERVER_FAILED.equals(respuesta.getOperation())) {
